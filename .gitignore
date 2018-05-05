@@ -1,0 +1,12 @@
+.DS_Store
+*.pth
+*.pyc
+*.pyo
+*.log
+*.tmp
+*.so
+
+# specific file
+out.jpg
+*.caffemodel
+
