@@ -28,5 +28,4 @@ code based on [bear63/sceneReco commit-ae1731e](https://github.com/bear63/sceneR
 
   python demo.py
   
-![Example Image](./01.jpg)
-![Example Image](./03.jpg)
+![Example Image](./IMG_1556.png)
