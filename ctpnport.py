@@ -36,6 +36,7 @@ class CTPNDetector:
         #def ctpnSource(NET_DEF_FILE, MODEL_FILE, use_gpu):
         #NET_DEF_FILE = "CTPN/models/deploy.prototxt"
         #MODEL_FILE = "CTPN/models/ctpn_trained_model.caffemodel"
+        self.caffe = caffe
         if use_gpu:
             caffe.set_mode_gpu()
             caffe.set_device(cfg.TEST_GPU_ID)
@@ -49,7 +50,13 @@ class CTPNDetector:
         self.draw_boxes = draw_boxes
         #return text_detector
     
-    def getCharBlock(self, im):
+    def getCharBlock(self, im, gpu_id=0):
+        if gpu_id < 0:
+            self.caffe.set_mode_cpu()
+        else:
+            self.caffe.set_mode_gpu()
+            self.caffe.set_device(gpu_id)
+
         resize_im, resize_ratio = self.resize_im(im, cfg.SCALE, cfg.MAX_SCALE)
         #print "resize", f
         #cv2.imshow("src", im)

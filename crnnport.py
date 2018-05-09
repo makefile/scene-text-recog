@@ -16,24 +16,26 @@ import cv2
 
 class CRNNRecognizer:
 
-    def __init__(self, model_path, use_gpu=True):
+    def __init__(self, model_path):
         #def crnnSource(model_path, use_gpu=True):
         alphabet = keys.alphabet # Chinese words
         self.converter = crnn_utils.strLabelConverter(alphabet)
         # note that in https://github.com/bear63/sceneReco support multi GPU.
         # model = crnn.CRNN(32, 1, len(alphabet)+1, 256, 1).cuda()
-        model = crnn.CRNN(32, 1, len(alphabet)+1, 256)
-        if use_gpu and torch.cuda.is_available():
-            model = model.cuda()
+        self.model = crnn.CRNN(32, 1, len(alphabet)+1, 256)
+        self.cpu_model = crnn.CRNN(32, 1, len(alphabet)+1, 256)
+        if torch.cuda.is_available():
+            self.model = self.model.cuda()
         print('loading pretrained model from %s' % model_path)
         #model_path = './crnn/samples/netCRNN63.pth'
-        model.load_state_dict(torch.load(model_path))
-        self.model = model
-        self.use_gpu = use_gpu
+        model_state_dict = torch.load(model_path)
+        self.model.load_state_dict(model_state_dict)
+        self.cpu_model.load_state_dict(model_state_dict)
+        #self.use_gpu = use_gpu
         #return model,converter
         
 
-    def crnnRec(self, im, text_recs):
+    def crnnRec(self, im, text_recs, use_gpu=True):
        texts = []
        index = 0
        for rec in text_recs:
@@ -58,13 +60,16 @@ class CRNNRecognizer:
     
            transformer = dataset.resizeNormalize((w, 32))
            image = transformer(image)
-           if self.use_gpu and torch.cuda.is_available():
+           model = self.cpu_model
+           if use_gpu and torch.cuda.is_available():
                image = image.cuda()
+               model = self.model
     
            image = image.view(1, *image.size())
            image = Variable(image)
-           self.model.eval()
-           preds = self.model(image)
+           model.eval()
+           print(type(model),type(image))
+           preds = model(image)
            _, preds = preds.max(2)
            preds = preds.squeeze(0)
            preds = preds.transpose(1, 0).contiguous().view(-1)

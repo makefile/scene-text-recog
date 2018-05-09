@@ -1,23 +1,25 @@
+#import frcnn
 import sys
 sys.path.insert(0, "./CTPN/tools")
-sys.path.insert(0, "./CTPN/src")
-#sys.path.insert(1, "./crnn")
+sys.path.insert(1, "./CTPN/src")
 sys.path.append("./crnn.pytorch")
 
-from ctpnport import *
-from crnnport import *
+from ctpnport import CTPNDetector
+from crnnport import CRNNRecognizer
 import time
+import cv2
 
 use_gpu = False
 #use_gpu = True
-#base_dir = '/home/s02/hgf/text-recog/sceneReco/'
 base_dir = './models/'
 demo_dir = '/home/s02/hgf/text-recog/sceneReco/test/'
-if use_gpu:
-    model_path = base_dir + 'netCRNN63.pth'
-else:
-    model_path = base_dir + 'netCRNNcpu.pth'
-    #model_path = base_dir + 'crnn.pth'
+gpu_id = -1
+if use_gpu: gpu_id = 0
+#    model_path = base_dir + 'netCRNN63.pth'
+#else:
+# CPU model can be used for both CPU/GPU
+model_path = base_dir + 'netCRNNcpu.pth'
+#model_path = base_dir + 'crnn.pth'
 # another one is crnn.pth
 
 NET_DEF_FILE = base_dir + "CTPN/deploy.prototxt"
@@ -27,7 +29,7 @@ caffe_path = '/home/s02/fyk/frcnn/'
 #ctpn
 ctpn_detector = CTPNDetector(NET_DEF_FILE, MODEL_FILE, caffe_path, use_gpu)
 #crnn
-crnn_recog = CRNNRecognizer(model_path, use_gpu)
+crnn_recog = CRNNRecognizer(model_path)
 
 #timer=Timer()
 print "\ninput exit break\n"
@@ -42,11 +44,11 @@ while 1 :
       continue
     #timer.tic()
     start = time.time()
-    text_lines, resize_im, resize_ratio = ctpn_detector.getCharBlock(im)
+    text_lines, resize_im, resize_ratio = ctpn_detector.getCharBlock(im, gpu_id)
     print 'boxes:',len(text_lines)
     text_recs = ctpn_detector.convert_bbox(text_lines)
     print text_recs
-    texts = crnn_recog.crnnRec(resize_im,text_recs)
+    texts = crnn_recog.crnnRec(resize_im,text_recs, use_gpu)
     print texts
     end = time.time()
     #print "Time: %f"%timer.toc()
