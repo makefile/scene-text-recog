@@ -28,20 +28,21 @@ class cfg:
 
 class CTPNDetector:
 
-    def __init__(self, NET_DEF_FILE, MODEL_FILE, caffe_path, use_gpu):
+    def __init__(self, NET_DEF_FILE, MODEL_FILE, caffe_path):
         sys.path.insert(0, "%s/python"%caffe_path)
         import caffe
         from other import draw_boxes, resize_im, CaffeModel 
         from detectors import TextProposalDetector, TextDetector
+        sys.path.remove("%s/python"%caffe_path)
         #def ctpnSource(NET_DEF_FILE, MODEL_FILE, use_gpu):
         #NET_DEF_FILE = "CTPN/models/deploy.prototxt"
         #MODEL_FILE = "CTPN/models/ctpn_trained_model.caffemodel"
         self.caffe = caffe
-        if use_gpu:
-            caffe.set_mode_gpu()
-            caffe.set_device(cfg.TEST_GPU_ID)
-        else:
-            caffe.set_mode_cpu()
+        #if use_gpu:
+        #    caffe.set_mode_gpu()
+        #    caffe.set_device(cfg.TEST_GPU_ID)
+        #else:
+        #    caffe.set_mode_cpu()
 
         # initialize the detectors
         text_proposals_detector = TextProposalDetector(CaffeModel(NET_DEF_FILE, MODEL_FILE))

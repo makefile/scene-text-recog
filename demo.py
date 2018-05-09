@@ -1,5 +1,8 @@
-#import frcnn
+# encoding: utf-8
 import sys
+caffe_path = '/home/s02/fyk/frcnn'
+sys.path.insert(0, "%s/python"%caffe_path)
+import caffe # import first to avoid problems like "CUDNN_STATUS_BAD_PARAM"
 sys.path.insert(0, "./CTPN/tools")
 sys.path.insert(1, "./CTPN/src")
 sys.path.append("./crnn.pytorch")
@@ -25,9 +28,8 @@ model_path = base_dir + 'netCRNNcpu.pth'
 NET_DEF_FILE = base_dir + "CTPN/deploy.prototxt"
 MODEL_FILE = base_dir + "CTPN/ctpn_trained_model.caffemodel"
 
-caffe_path = '/home/s02/fyk/frcnn/'
 #ctpn
-ctpn_detector = CTPNDetector(NET_DEF_FILE, MODEL_FILE, caffe_path, use_gpu)
+ctpn_detector = CTPNDetector(NET_DEF_FILE, MODEL_FILE, caffe_path)
 #crnn
 crnn_recog = CRNNRecognizer(model_path)
 
